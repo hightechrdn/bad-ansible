@@ -34,4 +34,13 @@
       file:
         path: /tmp/index.html
         state: absent
+
+- name: remove stale PostgeSQL db files
+  hosts: appdbs
+  gather_facts: false
+  become: true
+  tasks:
+  - file:
+      path: /var/lib/pgsql/
+      state: absent
 ...
