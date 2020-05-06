@@ -1,0 +1,64 @@
+[tower]
+tower1.0d0e.internal public_host_name=tower1.0d0e.example.opentlc.com ssh_host=tower2.0d0e.internal
+tower2.0d0e.internal public_host_name=tower2.0d0e.example.opentlc.com ssh_host=tower3.0d0e.internal
+tower3.0d0e.internal public_host_name=tower3.0d0e.example.opentlc.com ssh_host=tower1.0d0e.internal
+
+[isolated_group_ThreeTierApp]
+bastion.0d0e.internal public_hostname=bastion.0d0e.example.opentlc.com ssh_host=bastion.0d0e.internal
+
+[isolated_group_ThreeTierApp:vars]
+controller=tower
+
+[database]
+support1.0d0e.internal ssh_host=support1.0d0e.internal pgsqlrep_role=master
+
+[database_replica]
+support2.0d0e.internal ssh_host=support1.0d0e.internal pgsqlrep_role=replica
+
+[all:vars]
+ansible_user=ec2-user
+ansible_become=true
+admin_password='r3dhat2020'
+
+pg_host='support1.0d0e.internal'
+pg_port='5432'
+
+pg_database='awx'
+pg_username='awx'
+pg_password='r3dhat2020'
+pg_sslmode='prefer'  # set to 'verify-full' for client-side enforced SSL
+
+rabbitmq_port=5672
+rabbitmq_vhost=tower
+rabbitmq_username=tower
+rabbitmq_password='r3dhat2020'
+rabbitmq_cookie=cookiemonster
+
+# configure PostgreSQL replication parameters
+pgsqlrep_user='replicator'
+pgsqlrep_password='r3dhat2020'
+
+# Isolated Tower nodes automatically generate an RSA key for authentication;
+# To disable this behavior, set this value to false
+# isolated_key_generation=true
+
+
+# SSL-related variables
+
+# If set, this will install a custom CA certificate to the system trust store.
+# custom_ca_cert=/path/to/ca.crt
+
+# Certificate and key to install in nginx for the web UI and API
+# web_server_ssl_cert=/path/to/tower.cert
+# web_server_ssl_key=/path/to/tower.key
+
+# Use SSL for RabbitMQ inter-node communication.  Because RabbitMQ never
+# communicates outside the cluster, a private CA and certificates will be
+# created, and do not need to be supplied.
+# rabbitmq_use_ssl=False
+
+# Server-side SSL settings for PostgreSQL (when we are installing it).
+# postgres_use_ssl=False
+# postgres_ssl_cert=/path/to/pgsql.crt
+# postgres_ssl_key=/path/to/pgsql.key
+

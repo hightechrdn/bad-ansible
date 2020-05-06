@@ -1,0 +1,48 @@
+- name: Gather facts
+  hosts: all
+  become: yes
+
+
+- name: Failover PostgreSQL
+  hosts: database_replica
+  become: yes
+
+  vars:
+    env:
+      PATH: /opt/rh/rh-postgresql10/root/usr/bin:{{ ansible_env.PATH }}
+      PGDATA: /var/opt/rh/rh-postgresql10/lib/pgsql/data
+      LIBRARY_PATH: /opt/rh/rh-postgresql10/root/usr/lib64
+      JAVACONFDIRS: '/etc/opt/rh/rh-postgresql10/java:/etc/java'
+      LD_LIBRARY_PATH: /opt/rh/rh-postgresql10/root/usr/lib64
+      CPATH: /opt/rh/rh-postgresql10/root/usr/include
+      PKG_CONFIG_PATH: /opt/rh/rh-postgresql10/root/usr/lib64/pkgconfig
+
+  tasks:
+    - name: Get the current PostgreSQL Version
+      import_role:
+        name: samdoran.pgsql_replication
+        tasks_from: pgsql_version.yml
+
+    - name: Promote secondary PostgreSQL server to primary
+      command: pg_ctl promote
+      become_user: postgres
+      environment: "{{ env }}"
+      ignore_errors: yes
+
+
+- name: Update Ansible Tower database configuration
+  hosts: tower
+  become: yes
+
+  tasks:
+    - name: Update Tower postgres.py
+      lineinfile:
+        dest: /etc/tower/conf.d/postgres.py
+        regexp: "^(.*'HOST':)"
+        line: "\\1 '{{ hostvars[groups['database_replica'][0]]['ansible_facts']['default_ipv4']['address'] }}',"
+        backrefs: yes
+      notify: restart tower
+
+  handlers:
+    - name: restart tower
+      command: ansible-tower-service restart
