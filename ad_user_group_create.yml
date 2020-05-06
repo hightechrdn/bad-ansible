@@ -1,0 +1,21 @@
+---
+# Create AD users and groups
+- name: Create AD users
+  gather_facts: true
+  hosts: windows
+  vars_files:
+    - ./ad_user_vars.yml
+    - ./ad_group_vars.yml
+  tasks:
+  - name: Run win_ad_user_group role, ad_group.yml tasks file
+    include_role:
+      name: win_ad_user_group
+      tasks_from: ad_group.yml
+    loop: "{{ group_info }}" 
+
+  - name: Run win_ad_user_group role, ad_user.yml tasks file
+    include_role:
+      name: win_ad_user_group
+      tasks_from: ad_user.yml
+    loop: "{{ user_info }}" 
+

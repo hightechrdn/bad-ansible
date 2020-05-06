@@ -1,0 +1,8 @@
+---
+# ad_group.yml
+- name: Create AD group
+  win_domain_group:
+    name: "{{ item.name }}"
+    scope: "{{ item.scope }}"
+    state: present
+

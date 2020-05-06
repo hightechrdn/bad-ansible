@@ -1,0 +1,7 @@
+---
+group_info:
+  - name: dev
+    scope: domainlocal
+
+  - name: qa
+    scope: domainlocal

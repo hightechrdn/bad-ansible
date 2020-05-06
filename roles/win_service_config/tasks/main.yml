@@ -1,0 +1,31 @@
+---
+#tasks file for win_service_config
+- name: Debug
+  debug:
+    var: ansible_distribution
+
+- name: Install and configure service on Windows Server 2012 R2 Std.
+  block:
+  - name: Install package
+    win_chocolatey:
+      name: "{{ package_name }}"
+      package_params: "{{ package_params }}"
+      state: latest
+  
+  - name: Start service
+    win_service:
+      name: "{{ service_name }}"
+      path: "{{ service_path }}"
+      state: started
+      start_mode: auto
+  
+  - name: Open firewall port
+    win_firewall_rule:
+      name: "{{ package_name }}"
+      localport: "{{ local_port }}"
+      action: allow
+      direction: in
+      protocol: "{{ protocol_name }}"
+      state: present
+      enabled: yes
+#  when: ansible_facts['ansible_distribution'] == "Microsoft Windows Server 2012 R2 Standard"

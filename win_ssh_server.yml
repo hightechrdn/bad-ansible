@@ -1,0 +1,10 @@
+---
+# Install OpenSSH service on Windows Server OS
+- name: Install OpenSSH on Windows hosts
+  gather_facts: true
+  hosts: windows
+  vars_files:
+    - ./ssh_var.yml
+  roles:
+    - win_service_config
+

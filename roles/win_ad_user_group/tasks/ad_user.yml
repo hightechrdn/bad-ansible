@@ -1,0 +1,13 @@
+---
+# ad_user.yml
+- name: Create AD user
+  win_domain_user:
+    name: "{{ item.name }}"
+    firstname: "{{ item.firstname }}"
+    surname: "{{ item.surname }}"
+    password: "{{ item.password }}"
+    email: "{{ item.email }}"
+    group_name: "{{ item.group_name }}"
+    group_scope: "{{ item.group_scope }}"
+    state: present
+
